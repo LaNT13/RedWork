@@ -1,0 +1,369 @@
+@import "tailwindcss";
+
+/* ============================================================
+   REDWORK · Sistema de diseño
+   Un solo lugar donde viven los tokens de marca. Cambiar el
+   naranja aquí lo cambia en todo el sitio.
+   ============================================================ */
+
+@theme {
+  /* --- Marca ---------------------------------------------- */
+  /* PLACEHOLDER: sustituir por el hex oficial de RedWork.
+     La V1 del sitio usaba #E7711F. */
+  --color-brand: #e4571e;
+  --color-brand-dark: #c34714;
+  /* Variante para texto pequeño: el naranja de marca solo alcanza 3.3:1
+     sobre la crema y falla AA en tamaños normales. */
+  --color-brand-ink: #b03e10;
+  --color-brand-soft: #f59a52;
+  /* Canal RGB del naranja, para halos y estados sin repetir hex. */
+  --color-brand-tint: rgb(228 87 30 / 0.10);
+
+  /* --- Azul profundo: confianza / tracking ----------------- */
+  --color-navy: #1f3d5c;
+  --color-navy-dark: #162c43;
+  --color-navy-soft: #35618c;
+  /* Superficies claras sobre azul: se mezclan con la crema, no
+     con blanco, para que el bloque oscuro no se lea como un hueco. */
+  --color-on-navy: #e9e3d4;
+  --color-on-navy-2: #a9b8c8;
+
+  /* --- Papel ----------------------------------------------- */
+  --color-bg: #f7f4ec;
+  --color-surface: #ede7d6;
+  --color-surface-2: #e2dac4;
+
+  /* --- Tinta ----------------------------------------------- */
+  --color-ink: #211f1b;
+  --color-ink-2: #4b463d;
+  --color-ink-3: #655e50;
+
+  /* --- Verde: solo verificado / activo --------------------- */
+  --color-verde: #3d7a54;
+  /* Para texto sobre verde-soft, donde el verde de marca queda en 4.3:1. */
+  --color-verde-dark: #35694a;
+  --color-verde-soft: #e2ede5;
+
+  /* --- Líneas ---------------------------------------------- */
+  --color-line: rgb(33 31 27 / 0.12);
+  --color-line-strong: rgb(33 31 27 / 0.22);
+  --color-line-navy: rgb(233 227 212 / 0.16);
+
+  /* --- Tipografía ------------------------------------------ */
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+
+  /* --- Curvas ---------------------------------------------- */
+  --ease-out-rw: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visible en todo lo que no lleva esquina cortada.
+     Los elementos recortados usan un anillo interior (.rw-cut). */
+  :focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================================
+   Esquina cortada — el gesto de marca.
+   clip-path recorta también el outline del foco, así que el
+   anillo de foco se dibuja hacia adentro con box-shadow inset.
+   ============================================================ */
+
+@utility rw-cut {
+  --rw-cut-size: 0.875rem;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--rw-cut-size)),
+    calc(100% - var(--rw-cut-size)) 100%,
+    0 100%
+  );
+}
+
+@utility rw-cut-sm {
+  --rw-cut-size: 0.625rem;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--rw-cut-size)),
+    calc(100% - var(--rw-cut-size)) 100%,
+    0 100%
+  );
+}
+
+@utility rw-cut-lg {
+  --rw-cut-size: 1.75rem;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--rw-cut-size)),
+    calc(100% - var(--rw-cut-size)) 100%,
+    0 100%
+  );
+}
+
+/* Foco para elementos recortados: anillo interior de dos capas
+   para que se vea sobre cualquier fondo. */
+.rw-cut:focus-visible,
+.rw-cut-sm:focus-visible,
+.rw-cut-lg:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--color-bg),
+    inset 0 0 0 5px var(--color-navy);
+}
+
+/* ============================================================
+   Animaciones del widget de tracking
+   ============================================================ */
+
+@keyframes rw-dash {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes rw-pulse-ring {
+  0%   { transform: scale(0.6); opacity: 0.65; }
+  70%  { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes rw-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rw-anim-fade-up {
+  animation: rw-fade-up 0.6s var(--ease-out-rw) both;
+}
+
+/* ============================================================
+   Widget de tracking — recorrido del profesional/proveedor.
+   Los waypoints coinciden con la polilínea del mapa
+   (M46 200 H150 V132 H244 V60 H344) y los porcentajes con la
+   longitud acumulada de cada tramo, para que el marcador nunca
+   se salga de la ruta.
+   ============================================================ */
+
+@keyframes rw-ruta {
+  0%     { translate: 46px 200px; }
+  23.7%  { translate: 150px 200px; }
+  39.3%  { translate: 150px 132px; }
+  60.7%  { translate: 244px 132px; }
+  77.2%  { translate: 244px 60px; }
+  100%   { translate: 344px 60px; }
+}
+
+@keyframes rw-avance {
+  from { width: 8%; }
+  to   { width: 100%; }
+}
+
+@keyframes rw-latido {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+.rw-marcador {
+  animation: rw-ruta 11s linear infinite;
+}
+
+.rw-avance {
+  animation: rw-avance 11s linear infinite;
+}
+
+.rw-latido {
+  animation: rw-latido 1.8s ease-in-out infinite;
+}
+
+.rw-ruta-dash {
+  stroke-dasharray: 5 7;
+  animation: rw-dash 1.2s linear infinite;
+}
+
+.rw-halo {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: rw-pulse-ring 2.2s var(--ease-out-rw) infinite;
+}
+
+/* Con movimiento reducido el widget se queda quieto en un estado
+   legible: marcador a media ruta y barra a la mitad. */
+@media (prefers-reduced-motion: reduce) {
+  .rw-marcador { translate: 244px 132px; }
+  .rw-avance   { width: 60%; }
+}
+
+/* ============================================================
+   Interacción — spotlight, elevación y brillo de acento.
+
+   El spotlight recibe las coordenadas del cursor desde
+   <Spotlight> (components/ui/Spotlight.tsx), que escribe
+   --mouse-x / --mouse-y en cada elemento [data-spotlight].
+   Si no hay JS, o el puntero es táctil, o el usuario pidió menos
+   movimiento, todo esto simplemente no se enciende: el resplandor
+   nace en opacidad 0 y no hay salto de layout.
+   ============================================================ */
+
+@theme {
+  /* Canal RGB de los acentos, para derivar resplandores sin repetir hex. */
+  --rw-brand-rgb: 228 87 30;
+  --rw-brand-soft-rgb: 245 154 82;
+  --rw-navy-rgb: 31 61 92;
+}
+
+@utility rw-spotlight {
+  position: relative;
+  /* Color y alcance del resplandor: se puede sobrescribir por bloque. */
+  --rw-glow: var(--rw-brand-rgb);
+  --rw-glow-alpha: 0.1;
+  --rw-glow-size: 320px;
+}
+
+.rw-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-rw);
+  background: radial-gradient(
+    var(--rw-glow-size) circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgb(var(--rw-glow) / var(--rw-glow-alpha)),
+    transparent 70%
+  );
+}
+
+.rw-spotlight:hover::after,
+.rw-spotlight:focus-within::after {
+  opacity: 1;
+}
+
+/* Sobre azul el resplandor tiene que ser más claro para verse. */
+.rw-spotlight-navy {
+  --rw-glow: var(--rw-brand-soft-rgb);
+  --rw-glow-alpha: 0.14;
+}
+
+/* Elevación estándar de tarjeta. Un solo lugar para el gesto. */
+@utility rw-elevar {
+  transition:
+    transform 0.35s var(--ease-out-rw),
+    box-shadow 0.35s var(--ease-out-rw),
+    border-color 0.35s var(--ease-out-rw);
+}
+
+.rw-elevar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -30px rgb(33 31 27 / 0.6);
+}
+
+/* Los iconos dentro de una tarjeta reaccionan al hover del contenedor. */
+.rw-elevar .rw-icono,
+.rw-spotlight .rw-icono {
+  transition:
+    transform 0.35s var(--ease-out-rw),
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.rw-elevar:hover .rw-icono,
+.rw-spotlight:hover .rw-icono {
+  transform: scale(1.08);
+}
+
+/* Brillo exterior de acento para botones y bloques destacados. */
+@utility rw-brillo {
+  transition:
+    transform 0.3s var(--ease-out-rw),
+    box-shadow 0.3s var(--ease-out-rw),
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.rw-brillo:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 30px -12px rgb(var(--rw-brand-rgb) / 0.55);
+}
+
+.rw-brillo:active {
+  transform: scale(0.99);
+}
+
+/* Subrayado que crece de izquierda a derecha en enlaces de texto. */
+@utility rw-subraya {
+  position: relative;
+}
+
+.rw-subraya::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out-rw);
+}
+
+.rw-subraya:hover::after,
+.rw-subraya:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rw-spotlight::after { display: none; }
+  .rw-elevar:hover,
+  .rw-brillo:hover,
+  .rw-brillo:active { transform: none; }
+  .rw-elevar:hover .rw-icono,
+  .rw-spotlight:hover .rw-icono { transform: none; }
+}
